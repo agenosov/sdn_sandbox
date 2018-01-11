@@ -1,5 +1,15 @@
 ### Overall
 
+1. Organize directory structure - using the Google's *repo* tool or manually (if SSH access to github isn't possible due to proxy).
+    - in case of manual setup, look [here](https://github.com/Juniper/contrail-vnc/blob/master/default.xml) how the structure is to be organized)
+2. Launch *./third_party/fetch_packages.py* to obtain 3-rd party dependencies
+
+#### Notes about dependencies on Ubuntu
+
+* Some 3-rd parties are not fetched via the py- script, as it is provided from (?) additional PPA repository.
+
+* See *./tools/packages/debian/contrail/debian/builddep.trusty* - here is a full list of packages which are **not to be fetched**.
+
 1. SConstruct script imports the *tools/build/rules.py*
 
 2. SConstruct script creates the **default construction environment** and than attaches a *configure context to this environment* by calling the *Configure* function, which is inside the *SCons.SCript.SConscript* module.
