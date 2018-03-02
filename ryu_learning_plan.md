@@ -1,7 +1,10 @@
 ## LEARNING PLAN
 1. **[DONE]** Simple switch (see ./ryu/app/simple_switch_13.py)
 2. **[DONE]** Ensure that L2 Dumb switch is working
-3. REST API
+
+3. REST API:
+    ./ryu/app/ofctl_rest.py
+
 4. Link aggregation example
 5. OpenFlow API:   
    * trace receiving messages during negotiation phases

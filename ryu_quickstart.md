@@ -19,13 +19,18 @@
 4. To launch integrated tests:
    - sudo pip install nose
 
+### Using REST API
+
+* Activate 2 apps:
+    ryu-manager ryu/app/simple_switch.py ryu/app/ofctl_rest.py
+
+* [Available endpoints](http://ryu.readthedocs.io/en/latest/app/ofctl_rest.html)
+
 
 ## PROBLEMS & OPEN QUESTIONS
 
-1. Mininet was launched with options: --mac --switch ovsk --controller ryu. Ryu simple switch used OPF v.1.2.
-   There was an exception from MN: Please shut down the controller which is running on port 6633
-2. ryu-manager ./simple_switch_13.py ==> unsupported version 0x3. If possible, set the switch to use one of the versions
+1. ryu-manager ./simple_switch_13.py ==> unsupported version 0x3. If possible, set the switch to use one of the versions
    The same for v.1.4 (???)
    Who told it?! ovs-ofctl supports OpenFlow versions 0x1:0x4. [This message is either from MN or OVS]
    Besides, when running this app, ping passes for MN hosts (when using --switch ovs)
-3. **L2 Dumb switch doesn't works when using OPF versions 1.3 or 1.4** (I launch MN explicitly indicating OPF version...) - ???
+2. **L2 Dumb switch doesn't works when using OPF versions 1.3 or 1.4** (I launch MN explicitly indicating OPF version...) - ???

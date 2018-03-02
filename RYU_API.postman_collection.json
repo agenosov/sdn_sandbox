@@ -1,0 +1,211 @@
+{
+	"info": {
+		"name": "RYU API",
+		"_postman_id": "b3634ed7-2fff-344b-61cf-a5cddd7884cc",
+		"description": "Collection of requests to interact with RYU SDN controller",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get_switches",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/switches",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"switches"
+					]
+				},
+				"description": "Get switches connected to RYU SDN controller"
+			},
+			"response": []
+		},
+		{
+			"name": "get_concrete_switch",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/desc/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"desc",
+						"1"
+					]
+				},
+				"description": "Get params of switch"
+			},
+			"response": []
+		},
+		{
+			"name": "get_concrete_switch_flows",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/flow/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"flow",
+						"1"
+					]
+				},
+				"description": "Get flows installed on the 1-st switch"
+			},
+			"response": []
+		},
+		{
+			"name": "get_concrete_switch_flows_filtered",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"out_port\": 1\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/flow/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"flow",
+						"1"
+					]
+				},
+				"description": "Filter flows installed on the 1-st switch"
+			},
+			"response": []
+		},
+		{
+			"name": "add_flow_entry",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"dpid\": 1,\n\t\"cookie\": 42,\n\t\"priority\": 45000,\n\t\"match\": {\n\t\t\"in_port\": 2\n\t},\n\t\"actions\": []\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/flowentry/add",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"flowentry",
+						"add"
+					]
+				},
+				"description": "Add flow entry to drop packets arrived via port 2 on the switch.\nNote that priority of this flow must be higher than priorities of flows which instruct where to forward packets."
+			},
+			"response": []
+		},
+		{
+			"name": "flow_entry_delete_strict",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"dpid\": 1,\n\t\"actions\": [],\n\t\"priority\": 32000\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/flowentry/delete_strict",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"flowentry",
+						"delete_strict"
+					]
+				},
+				"description": "Delete strictly specified flow entry"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "09378c77-40f1-4261-8ad8-c9d7d7764a98",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "26fe6fc4-c5de-493d-bf22-b5b521cbed06",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
