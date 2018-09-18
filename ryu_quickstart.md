@@ -1,20 +1,26 @@
-## HOW-TO
+## HOW-TO for Ubuntu
+
 1. sudo apt-get install mininet
-   Test: sudo mn --test pingall                                                   (a)
-         sudo mn --topo single,3 --mac --switch ovsk --controller [remote|ryu]    (b)
+
+   Test:
+   * sudo mn --test pingall                                                   (a)
+   * sudo mn --topo single,3 --mac --switch ovsk --controller [remote|ryu]    (b)
    
    Tips:
-   * For both (a) & (b), the ovs-vswitchd service must be launched
+   * For both (a) & (b), the *openvswitch-switch* service must be launched
    * During (b), MN try to connect remote controller at localhost:6633 (6633 is OpenFlow port)
    * As no controller is launched: there is a message: "Unable to contact the remote controller..." and pingall fails
-   * Support for concrete version of OPF could be enabled by passing additional parameter: --switch ovs,protocols=OpenFlow14
+   * _Support for concrete version of OPF could be enabled_ by passing additional parameter: *--switch ovs,protocols=OpenFlow14*
 
 2. cd ryu && PYTHONPATH=.
+
    ./bin/ryu-manager ryu/app/simple_switch.py
 
-   Now connection is established between MN switch & Ryu controller - pingall should be passed
+   Now connection is established between MN switch & Ryu controller - *pingall should be passed*
 
-3. Dump flows for switch s1: sudo ovs-ofctl -O OpenFlow13 dump-flows s1
+3. Dump flows for switch s1: 
+
+   *sudo ovs-ofctl -O OpenFlow13 dump-flows s1*
 
 4. To launch integrated tests:
    - sudo pip install nose
@@ -22,7 +28,8 @@
 ### Using REST API
 
 * Activate 2 apps:
-    ryu-manager ryu/app/simple_switch.py ryu/app/ofctl_rest.py
+
+  *ryu-manager ryu/app/simple_switch.py ryu/app/ofctl_rest.py*
 
 * [Available endpoints](http://ryu.readthedocs.io/en/latest/app/ofctl_rest.html)
 
