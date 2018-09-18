@@ -1,6 +1,7 @@
 ## How ryu-manager works
 
-* A list of applications is instantiated. If no apps is provided via command line, this list will contain only the *ryu.controller.ofp_handler* application
+* A list of applications is instantiated.</br>
+  If no apps is provided via command line, this list will contain only the *ryu.controller.ofp_handler* application
 
 * Instance of application manager is created
 
@@ -9,9 +10,8 @@
 
 ### Loading apps & context
 
-* AppManager attempts to load each specified application by first importing a module corresponding to the app's name and than by making an inspection of imported module. Module must define a subclass of RyuApp - only in this case inspection will be passed and defined class will be returned (see *ryu.base.app_manager.AppManager.load_apps*) in order to be saved inside a dictionary which maps application names to corresponding classes. This is *the stage of applications loading*.
-    
-* The dictionary mapping app names to corresponding classes will be required for apps instantiation.
+* AppManager attempts to load each specified application by first importing a module corresponding to the app's name and than by making an inspection of imported module. Module must define a subclass of RyuApp - only in this case inspection will be passed and defined class will be returned in order to be saved inside a dictionary which maps application names to corresponding classes. 
+  This is *the stage of applications loading* (see *ryu.base.app_manager.AppManager.load_apps*). The dictionary mapping app names to corresponding classes will be required for apps instantiation.
 
 * In this stage AppManager also creates all *context classes* - these are classes which other applications want to use.
 
@@ -41,6 +41,12 @@ The concrete example of using context is how *SimpleSwitchRest13* gains access t
 
 * After all apps are instantiated they begin to start. **Starting each app leads to creation of a new thread**.
 
+* The working thread of RyuApp is designated to processing of events received from a queue (which is an *eventlet.queue.LightQueue*).
+  Upon receiving each event the application could determine a list of handlers to process this concrete event:
+  ```python
+  handlers = self.get_handlers(ev, state)
+  ```
+
 * If at least one app is going to use *WSGIApplication* then WSGIServer is to be launched.
 
 After all apps are started *ryu-manager* waits for their threads are finished
@@ -50,10 +56,14 @@ After all apps are started *ryu-manager* waits for their threads are finished
 
 * One source of events for RYU apps is *OpenFlow controller* - it transforms into events messages received from switches
 
+* Differences between the *set_ev_cls* and *set_ev_handler* decorators:
+
+    1. the former is used to ...**TODO** 
+    2. the latter is used to ...**TODO**    
+
 
 ### Questions
 
-* Observers vs handlers of events? This relates to the question *when to use the set_ev_cls and when the set_ev_handler*
-
+* Observers vs handlers of events? 
 * What are *bricks*? See working whith them during apps instantiation
 
