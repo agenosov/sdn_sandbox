@@ -16,7 +16,7 @@
 * In this stage AppManager also creates all *context classes* - these are classes which other applications want to use.
 
     1. each RyuApp may define the *_CONTEXTS* field, which is a dictionary for classes required by this app
-    2. AppManager fills own dictionary of *context classes* on loading applications (see above), checking presense of *context classes* for each loaded app by using class method *ryu.base.app_manager.RyuApp.context_iteritems*
+    2. AppManager fills own **dictionary of context classes** on loading applications (see above), checking presense of *context classes* for each loaded app by using class method *ryu.base.app_manager.RyuApp.context_iteritems*
     3. Concrete instances of these *context classes* are created in order to be later used during apps instantiation:
     ```python
     app_mgr.instantiate_apps(**contexts)
@@ -26,9 +26,9 @@ The concrete example of using context is how *SimpleSwitchRest13* gains access t
 
 ### Instantiating apps
 
-* Instantiation of an app means creating an instance of a class and *registering an app within RYU framework*.
+* Instantiation of an app means creating an instance of a class and **registering an app within RYU framework**.
 
-* Registration of an app means registering of event handlers.
+* Registration of an app means **registering of event handlers**.
     
     1. All methods of the application instance *decorated by either set_ev_cls or set_ev_handler* are registered as *handlers of events*. 
     2. The *detection of such handlers* is performed by calling *ryu.controller.handler.register_instance*.
@@ -66,4 +66,5 @@ After all apps are started *ryu-manager* waits for their threads are finished
 
 * Observers vs handlers of events? 
 * What are *bricks*? See working whith them during apps instantiation
+* Why not to use a static method *AppManager.run_apps*? It's more convenient.
 
