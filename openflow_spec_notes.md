@@ -1,5 +1,34 @@
-## Notes from the Section 7
+## Questions at Stackoverflow related to learning OPF
 
+* [what if a flow table is full](https://stackoverflow.com/questions/49275450/how-does-a-flow-entry-change-in-an-open-flow)
+
+
+## Notes related to OPF channel & connection management
+
+### Message types supported by OPF
+
+* _controller-to-switch_
+* _async_ (initiated by the switch, used to inform the controller about changes)
+* _symmetric_ (can be initiated by both sides). **Experimenter** messages fall into this category.
+
+### Connection setup & maintenance
+
+* After connection setup is done **one of the 1-st things the controller should do** is to get the *Datapath ID of the switch* (as a reply to *OFPT_FEATURES_REQUEST* message).
+
+* A switch management protocol such as *OF-CONFIG* is recommended to be used for configuring and managing security credentials.
+
+### Multiple controllers
+
+* Controller can specify which types of async messages from switch are sent over its channel in order to **control which message types can be enabled of filtered**.
+
+* As a key takeaways from [CAP for Networks](https://people.eecs.berkeley.edu/~alig/papers/cap-for-networks.pdf):
+
+** controllers typically communicate through *out-of-band management network* to coordinate among themselves... so there could be a situation where **the controllers are partitioned from each other** while the data network bacame connected... as a result **network policies may be violated**.
+
+** _hybrid approaches_ (i.e. where controllers revert to *in-band control* where the out-of-band control network is partitioned) provide comparable simplicity (to out-of-band) while providing greater resilency.
+
+
+## Notes related to the details of OPF Switch Protocol 
 
 ### About switch ports
 
