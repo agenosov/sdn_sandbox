@@ -3,6 +3,43 @@
 * [what if a flow table is full](https://stackoverflow.com/questions/49275450/how-does-a-flow-entry-change-in-an-open-flow)
 
 
+## Common terms
+
+* Flow entry in a switch flow table consists of:
+    - match fields
+    - a priority for matching
+    - counters
+    - a set of instructions to apply to matching packet.
+
+* Instructions associated with flow entry contain either _actions_ or _modify pipeline processing_.
+
+    Examples of actions: packet forwarding, packet modification, group table processing.
+
+    Pipeline processing instructions allow packets to be sent to subsequent tables for further processing and allow metadata to be communicated between tables.
+
+    The same as above in another words with more details: an **instruction either modifies pipeline processing** (such as directing the packet to another flow table), or **contains a set of actions to add to the action set**, or **contains a list of actions to apply immediatly to the packet**.
+
+* During pipeline processing a set of values (_pipeline fields_) can be attached to the packet:
+
+    - the ingress port (a property of the packet throughout the OPF pipeline)
+
+    - the metadata value
+
+    - the Tunnel-ID (a packet may have this extra pipeline field when it's associated with a *logical OPF port*)
+
+* Actions may be _accumulated in the Action Set_ of the packet or _applied immediately_ to the packet.
+
+* A switch element that can measure and control the rate of packets is called a **meter**. It _triggers_ a meter **band** if the packet rate (or byte rate) passing through the meter exceeds a predefined threshold.
+
+    Each meter may have several bands. Band specifies a target rate and a way packets should be processed if that rate is exceeded.
+
+    Example is a rate limiter whose band drops the packet.
+
+    Meters are attached directly to flow entries (as opposed to queues attached to ports). There's a separate meter table.
+
+* Pipeline processing happens in two stages: *ingress processing and egress processing*. Egress processing happens after the determination of the output port and happens in the context of this port.
+
+
 ## Notes related to OPF channel & connection management
 
 ### Message types supported by OPF
@@ -10,6 +47,12 @@
 * _controller-to-switch_
 * _async_ (initiated by the switch, used to inform the controller about changes)
 * _symmetric_ (can be initiated by both sides). **Experimenter** messages fall into this category.
+
+### Message Handling
+
+* In the absence of barrier messages, switches may reorder messages to maximize performance => **controllers shouldn't depend on a specific processing order**... If 2 messages from the controller depend on each other:
+    - they must either *be separated by a barrier message*
+    - or *be put in the same ordered bundle*.
 
 ### Connection setup & maintenance
 
@@ -23,19 +66,22 @@
 
 * As a key takeaways from [CAP for Networks](https://people.eecs.berkeley.edu/~alig/papers/cap-for-networks.pdf):
 
-** controllers typically communicate through *out-of-band management network* to coordinate among themselves... so there could be a situation where **the controllers are partitioned from each other** while the data network bacame connected... as a result **network policies may be violated**.
+    - controllers typically communicate through *out-of-band management network* to coordinate among themselves... so there could be a situation where **the controllers are partitioned from each other** while the data network bacame connected... as a result **network policies may be violated**.
 
-** _hybrid approaches_ (i.e. where controllers revert to *in-band control* where the out-of-band control network is partitioned) provide comparable simplicity (to out-of-band) while providing greater resilency.
+    - _hybrid approaches_ (i.e. where controllers revert to *in-band control* where the out-of-band control network is partitioned) provide comparable simplicity (to out-of-band) while providing greater resilency.
 
 
 ## Notes related to the details of OPF Switch Protocol 
 
 ### About switch ports
 
-* In general, the port config bits are set by the controller and not changed by the switch. 
-  If the port config bits are changed by the switch through another administrative interface, the switch sends an OFPT_PORT_STATUS message to notify the controller of the change.
+* In general, the port config bits are set by the controller and not changed by the switch.
 
-* When the port state flags are changed, the switch sends an OFPT_PORT_STATUS message to notify the controller of the change
+* The switch sends an *OFPT_PORT_STATUS message* to notify the controller of the change when:
+
+    - the port config bits are changed by the switch through another administrative interface.
+
+* Port addition, modification or removal never changes the content of the flow tables. **When a port is deleted it's left to the controller to clean up any flow entries** (or group entries) referencing that port.
 
 
 ### About switch queues
@@ -66,7 +112,7 @@ can be used to schedule packets exiting the datapath on that output port.
 
 * If oxm_hasmask is 1, *each 1-bit in oxm_mask constrains the OXM TLV to match only packets in which the corresponding bit of the field equals the corresponding bit in oxm_value*.
 
-* Most match fields have prerequisites (another match field type and match field value that this match field depends on) - see *Header Match Fields*.
+* Most match fields have prerequisites (another match field type and match field value that this match field depends on) - see [Header Match Fields](https://www.opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.5.1.pdf#paragraph.7.2.3.8)
 
 * Note for how switches deal with matches: **if the match in a flow mod message specifies a field but fails to specify its prerequisites, the switch must return an error** with *OFPET_BAD_MATCH* type and *OPFBMC_BAD_PREREQ* code (for example, specifies an IPv4 addr without matching the EtherType to 0x800).
 
@@ -77,11 +123,26 @@ can be used to schedule packets exiting the datapath on that output port.
     - *pipeline match fields* - matching values attached to the packet for pipeline processing
 
 
+### Flow Stats
+
+* OPF *Extensible Stat format* follow the same convention as OXM format.
+
+* Each flow table of the switch must support the [required stat fields](https://www.opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.5.1.pdf#paragraph.7.2.4.4):
+
+    - OXS_OF_DURATION
+    - OXS_OF_IDLE_TIME
+    - OXS_OF_FLOW_COUNT
+    - OXS_OF_PACKET_COUNT
+    - OXS_OF_BYTE_COUNT
+
+
 ### Flow Instructions
 
 * Instructions (associated with the flow entry) are executed when a packet matches the entry.
 
 * For the *Apply-Actions* instruction, the *actions field is treated as a list*. For the *Write-Actions* instruction, the *actions field is treated as a set*.
+
+* *STAT_TRIGGER* instruction type allows the controller to receive a trigger for one or many thresholds, i.e. *when one of the stat field values of the flow entry crosses threshold*.
 
 
 ### Controller-to-Switch messages
