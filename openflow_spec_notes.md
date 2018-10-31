@@ -1,8 +1,3 @@
-## Questions at Stackoverflow related to learning OPF
-
-* [what if a flow table is full](https://stackoverflow.com/questions/49275450/how-does-a-flow-entry-change-in-an-open-flow)
-
-
 ## Common terms
 
 * Flow entry in a switch flow table consists of:
@@ -51,7 +46,7 @@
 ### Message Handling
 
 * In the absence of barrier messages, switches may reorder messages to maximize performance => **controllers shouldn't depend on a specific processing order**... If 2 messages from the controller depend on each other:
-    - they must either *be separated by a barrier message*
+    - they must either *be separated by a barrier message* ([here](https://www.juniper.net/documentation/en_US/junos/topics/concept/junos-sdn-openflow-messages-barrier-overview.html) is a very useful explanation)
     - or *be put in the same ordered bundle*.
 
 ### Connection setup & maintenance
@@ -62,7 +57,7 @@
 
 ### Multiple controllers
 
-* Controller can specify which types of async messages from switch are sent over its channel in order to **control which message types can be enabled of filtered**.
+* Controller can [specify which types of async messages from switch are sent](https://www.opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.5.1.pdf#subsubsection.7.3.10) over its channel in order to **control which message types can be enabled of filtered**.
 
 * As a key takeaways from [CAP for Networks](https://people.eecs.berkeley.edu/~alig/papers/cap-for-networks.pdf):
 
@@ -72,6 +67,13 @@
 
 
 ## Notes related to the details of OPF Switch Protocol 
+
+* Most structures are packed with padding and 8-byte aligned. All messages are sent in Big-endian.
+* Message header contains:
+    - version
+    - type of message
+    - total length of the message (including the header)
+    - transaction id (replies use the same value as was in the request)
 
 ### About switch ports
 
@@ -149,19 +151,28 @@ can be used to schedule packets exiting the datapath on that output port.
 
 * _Handshake_: the controller requests switch features, and the switch must reply with *OFPT_FEATURES_REPLY* message. The reply contains:
     - *datapath_id* - lower 48-bits are for a MAC address, the upper 16-bits are implementer-defined (for example, it could be VLAN ID to distinguish multiple virtual switch instances on a single physical switch)
-    - the maximum number of packets the switch can buffer (when sending packets to the controller using packet-in messages)
+    - the maximum number of packets the switch can buffer (when sending packets to the controller using *packet-in* messages)
     - number of tables supported by the switch, the type of connection (main or auxiliary)
-    - bitmap which defines the switch capabilities.
+    - bitmap which defines the switch capabilities... the *OFPC_PORT_BLOCKED* bit isn't set => the controller should prevent packet loops.
 
-* The controller is able to *set and query configuration parameters in the switch*. For the OPF v.1.3.5, these parameters include:
+* The controller is able to *set and query configuration parameters in the switch*:
     - bitmap with combination of flags which indicate how IP fragments should be treated by the switch
     - the number of bytes of each packet sent to the controller by the switch pipeline.
 
-* For the *flow mod message*:
-    - the *buffer_id* refers to a packet buffered at the switch and sent to the controller by a packet-in message (if the buffer_id is valid, flow-mod removes the corresponding packet from the buffer and processes it through the OpenFlow pipeline after the flow is inserted, starting at the first flow table)
-    - the *flags* field controls whether the *Send flow removed message* is to be sent by the switch **when flow expires or is deleted**.
+* Flow table of a switch has a *dynamic configuration* which can be controlled with the [*OFPT_TABLE_MOD*](https://www.opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.5.1.pdf#paragraph.7.3.4.1) message.
 
-* The *OFPT_PORT_MOD message* is used by the controller to modify the behavior of the port on the switch - **what behaviour and what for???**
+    Flow table dynamic configuration defines:
+    - if a flow table is authorized to **evict flows** (the OFPTC_EVICTION bit is set => switch can evict flow tables)
+    - if switch must generate **vacancy events** (means that flow table has or hasn't a space for new flows).
+
+    Parameters for vacancy events can be controlled by specifying the OFPTMPT_VACANCY property (list of properties is a separate field inside a table modification message):
+    - for instance when the remaining space in the flow table decreases to less than a specified threshold, a **vacancy down event must be generated** to the controller (if vacancy down events are *enabled*).
+
+* For the *flow mod message*:
+    - the *buffer_id* refers to a packet buffered at the switch and sent to the controller by a *packet-in* message (if the buffer_id is valid, flow-mod removes the corresponding packet from the buffer and processes it through the OpenFlow pipeline after the flow is inserted, starting at the first flow table)
+    - the *flags* field could be used to control whether the *Send flow removed message* is to be sent by the switch **when flow expires or is deleted**.
+    - the flags of the flow entry are **not changed on flow modify** (but the *OFPFF_RESET_COUNTS* could be used and switch must honor this flag).
+    - **(match, priority) is an unique identifier of the flow entry in the table**
 
 * About *meter-modification messages*:
     - the OPF protocol defines some *virtual* meters which can't be associated with flows (for slow datapath, for controller connection)
@@ -169,5 +180,7 @@ can be used to schedule packets exiting the datapath on that output port.
     - the *rate* field of the band indicates **the rate value above which the corresponding band may apply to packets**. The rate value is in kbits/sec (unless the flags field includes OFPMF_PKTPS)
 
 * _Multipart messages_ are used to request statistics or state information from the switch.
+
+### Asynchronous messages
 
 * Controller can set and query the *async* messages which it wants to receive **via a given OPF channel**.

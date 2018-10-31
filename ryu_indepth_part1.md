@@ -33,6 +33,11 @@ The concrete example of using context is how *SimpleSwitchRest13* gains access t
     1. All methods of the application instance *decorated by either set_ev_cls or set_ev_handler* are registered as *handlers of events*. 
     2. The *detection of such handlers* is performed by calling *ryu.controller.handler.register_instance*.
     3. Registration of detected handler is the responsibility of RyuApp (*ryu.base.app_manager.RyuApp.register_handler*).
+
+* Application manager reports *which events each application provides and for which applications* and also *which events each application consumes*:
+
+** the _RyuApp.observers_ dictionary provides a *mapping from an event class to a list of applications interested to consume an event*
+** the *RyuApp.event_handlers* dictionary provides a *mapping from an event class to a list of handlers inside a concrete application*
     
 * Finally on this stage the another mapping is created: from app name to corresponding **class instance**
 
@@ -65,6 +70,5 @@ After all apps are started *ryu-manager* waits for their threads are finished
 ### Questions
 
 * Observers vs handlers of events? 
-* What are *bricks*? See working whith them during apps instantiation
 * Why not to use a static method *AppManager.run_apps*? It's more convenient.
 
