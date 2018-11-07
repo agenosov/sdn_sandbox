@@ -179,7 +179,26 @@ can be used to schedule packets exiting the datapath on that output port.
     - one of the fields is *the list of bands*, and if the current rate of packets exceeds the rate of multiple bands, the band with the highest configured rate is used
     - the *rate* field of the band indicates **the rate value above which the corresponding band may apply to packets**. The rate value is in kbits/sec (unless the flags field includes OFPMF_PKTPS)
 
-* _Multipart messages_ are used to request statistics or state information from the switch.
+#### Multipart messages
+
+* Multipart messages are used to request statistics or to set or retrieve state information from the switch.
+
+    The type field of such messages specifies the kind of information being passed (both in a request and in a response) and determines how the body field is to be interpreted.
+
+    If a controller receives a sequence of multipart reply messages without a message with OFPMPF_REPLY_MORE flag as zero, the controller must discard the whole reply (after a controller defined amount of time greater than 1 second from the last message).
+
+* A controller can request the capabilities of currently configured flow tables or request another configuration of flow tables via *OFPMP_TABLE_FEATURES* message.
+
+    If the request body isn't empty the controller can enable, disable or modify flow tables and also replace the full pipeline. For instance, a flow table can be removed from the pipeline.
+
+    The command field inside the body of the table features request determines the operation to be performed:
+    - replace full pipeline
+    - modify flow table capabilities
+    - enable/disable flow table in pipeline.
+
+    The maximum number of flow entries that can be inserted into specific flow table is the read-only field and returned by the switch.
+
+    The properties field describes misc capabilities of the flow table. Each item in the list of properties determines the capability either for regular flow entry or for the table-miss flow entry.
 
 ### Asynchronous messages
 
