@@ -1,0 +1,97 @@
+version: 2
+vlans:
+    10:
+        name: Sandbox VLAN
+    11:
+        name: Other sandbox VLAN
+dps:
+    s1:
+        dp_id: 0x1
+        description: Aggregate Switch
+        hardware: "Open vSwitch"
+        # A port not explicitly defined in the configuration will be left down and will drop all packets
+        # (https://docs.faucet.nz/en/latest/configuration.html)
+        interfaces:
+            1: # -> s1r1
+               name: s1-eth1
+               description: Connection to Rack 1
+               # a list of tagged_vlans that are allowed to pass through this interface
+               # (the 'native_vlan' attribute is used to associate a specific VLAN with untagged packets arriving and leaving this interface)
+               tagged_vlans: [10, 11]
+            2: # -> s1r2
+               name: s1-eth2
+               description: Connection to Rack 2
+               tagged_vlans: [10, 11]
+            3: # -> s1r3
+               name: s1-eth3
+               description: Connection to Rack 3
+               tagged_vlans: [10, 11]
+            4: # -> s1r4
+               name: s1-eth4
+               description: Connection to Rack 4
+               tagged_vlans: [10, 11]
+
+    s1r1:
+        description: Rack 1 ToR Switch
+        dp_id: 0x0000000000000011
+        interfaces:
+            1: # -> h1r1
+               description: Connection to Host 1 on Rack 1
+               native_vlan: 10
+            2: # -> h2r1
+               native_vlan: 10
+            3: # -> h3r1
+               native_vlan: 11
+            4: # -> h4r1
+               native_vlan: 11
+            5: # -> s1
+               description: Connection to Aggregate Switch
+               tagged_vlans: [10, 11]
+    
+    s1r2:
+        description: Rack 2 ToR Switch
+        dp_id: 0x0000000000000021
+        interfaces:
+            1: # -> h1r2
+               native_vlan: 10
+            2: # -> h2r2
+               native_vlan: 10
+            3: # -> h3r2
+               native_vlan: 11
+            4: # -> h4r2
+               native_vlan: 11
+            5: # -> s1
+               description: Connection to Aggregate Switch
+               tagged_vlans: [10, 11]
+    
+    s1r3:
+        description: Rack 3 ToR Switch
+        dp_id: 0x0000000000000031
+        interfaces:
+            1: # -> h1r3
+               native_vlan: 10
+            2: # -> h2r3
+               native_vlan: 10
+            3: # -> h3r3
+               native_vlan: 11
+            4: # -> h4r3
+               native_vlan: 11
+            5: # -> s1
+               description: Connection to Aggregate Switch
+               tagged_vlans: [10, 11]
+    
+    s1r4:
+        description: Rack 4 ToR Switch
+        dp_id: 0x0000000000000041
+        interfaces:
+            1: # -> h1r4
+               native_vlan: 10
+            2: # -> h2r4
+               native_vlan: 10
+            3: # -> h3r4
+               native_vlan: 11
+            4: # -> h4r4
+               native_vlan: 11
+            5: # -> s1
+               description: Connection to Aggregate Switch
+               tagged_vlans: [10, 11]
