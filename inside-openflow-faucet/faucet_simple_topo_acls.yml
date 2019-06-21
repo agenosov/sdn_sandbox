@@ -1,0 +1,144 @@
+version: 2
+vlans:
+    sandbox:
+        vid: 10
+acls:
+    guard1:
+        # Allow from h2 to h3 (PUBLIC SVC -> INTERNAL SVC)
+        - rule:
+            eth_type: 0x0806
+            arp_spa: 10.0.0.2
+            arp_tpa: 10.0.0.3
+            actions:
+                allow: 1
+        
+        # Deny any other requests to h3 (INTERNAL SERVICE host)
+        - rule:
+            eth_type: 0x0806
+            arp_tpa: 10.0.0.3
+            actions:
+                allow: 0
+        
+        # Allow ARP to any host
+        - rule:
+            eth_type: 0x0806
+            actions:
+                allow: 1
+
+        # Allow h2 to ping h3
+        - rule:
+            # NOTE: in order to match on any IP fields, the EtherType must be specified(!!!)
+            eth_type: 0x0800 # IPv4
+            ip_proto: 0x01
+            ipv4_src: 10.0.0.2
+            ipv4_dst: 10.0.0.3
+            actions:
+                allow: 1
+
+        # Deny any other ICMP requests to h3
+        - rule:
+            eth_type: 0x0800 # IPv4
+            ip_proto: 0x01
+            ipv4_dst: 10.0.0.3
+            actions:
+                allow: 0
+
+        # Allow ICMP
+        - rule:
+            eth_type: 0x0800 # IPv4
+            ip_proto: 0x01
+            actions:
+                allow: 1
+
+        # Allow TCP port 80 to 10.0.0.2 (i.e. PUBLIC SERVICE host) from any host
+        - rule:
+            eth_type: 0x0800
+            ipv4_dst: 10.0.0.2
+            ip_proto: 0x06 # TCP
+            tcp_dst: 80
+            actions:
+                allow: 1
+
+        # Allow TCP port 80 to 10.0.0.3, but only from 10.0.0.2 (PUBLIC SVC -> INTERNAL SVC)
+        - rule:
+            eth_type: 0x0800
+            ipv4_src: 10.0.0.2
+            ipv4_dst: 10.0.0.3
+            ip_proto: 0x06 # TCP
+            tcp_dst: 80
+            actions:
+                allow: 1
+
+        # (!!!) Allow responses from PUBLIC SERVICE
+        #
+        # TODO: check the TCP flags to make sure that connections are not initiated from an opened port
+        # This is possible with OF 1.4+
+        #
+        - rule:
+            eth_type: 0x0800
+            ipv4_src: 10.0.0.2
+            ip_proto: 0x06 # TCP
+            tcp_src: 80
+            actions:
+                allow: 1
+
+        # the same rule - to communication 10.0.0.3 -> 10.0.0.2 via TCP/80 (allow responses)
+        - rule:
+            eth_type: 0x0800
+            ipv4_src: 10.0.0.3
+            ipv4_dst: 10.0.0.2
+            ip_proto: 0x06 # TCP
+            tcp_src: 80
+            actions:
+                allow: 1
+
+        # Disallow ANY OTHER IPv4 traffic to 10.0.0.2
+        - rule:
+            eth_type: 0x0800
+            ipv4_dst: 10.0.0.2
+            actions:
+                allow: 0
+
+        # Disallow any other IPv4 traffic to 10.0.0.3 (INTERNAL SVC)
+        - rule:
+            eth_type: 0x0800
+            ipv4_dst: 10.0.0.3
+            actions:
+                allow: 0
+        
+        - rule:
+            eth_type: 0x0800
+            ipv4_src: 10.0.0.1/24
+            actions:
+                allow: 1
+        
+        # All other packets are to be dropped
+dps:
+    s1:
+        dp_id: 0x1
+        description: Access Switch
+        hardware: "Open vSwitch"
+        # A port not explicitly defined in the configuration will be left down and will drop all packets
+        # (https://docs.faucet.nz/en/latest/configuration.html)
+        interfaces:
+            1: # -> h1
+               name: s1-eth1
+               native_vlan: sandbox
+               acl_in: guard1
+            2: # -> h2
+               name: s1-eth2
+               native_vlan: sandbox
+               acl_in: guard1
+               # NOTE: in this case there will be no rule at the switch's FLOOD table which instructs to flood unknown packets received via port 2
+               unicast_flood: false
+               # NOTE: the flow for this port in the ETH_SRC table will be without HARD_TIMEOUT.
+               # In this case set the 'max_hosts' option on the VLANs in use by this port in order to prevent fulling ETH_SRC/ETH_DST tables
+               permanent_learn: true
+            3: # -> h3
+               name: s1-eth3
+               native_vlan: sandbox
+               acl_in: guard1
+            4: # -> h4
+               name: s1-eth4
+               native_vlan: sandbox
+               acl_in: guard1

@@ -1,0 +1,132 @@
+version: 2
+vlans:
+    10:
+        name: Sandbox VLAN
+acls:
+    1:
+      - rule: # Block h2r1 from receiving any IPv4 packets
+        # EtherTypes can be found here:
+        #         http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml
+          eth_type: 0x0800   # IPv4
+          ipv4_dst: 10.0.0.5 # IP address for h2r1
+          actions:
+              allow: 0
+      - rule: # Drop all TCP traffic to h3r1 on port 5001 (iperf’s server port)
+          eth_type: 0x0800   # IPv4
+          ipv4_dst: 10.0.0.9 # IP address for h3r1
+          # List of match fields: https://ryu.readthedocs.io/en/latest/app/ofctl_rest.html#description-of-match-on-request-messages
+          ip_proto: 6
+          tcp_dst: 5001
+          actions:
+              allow: 0
+      - rule: # Allow all other packets
+          actions:
+              allow: 1
+dps:
+    s1:
+        dp_id: 0x1
+        description: Aggregate Switch
+        hardware: "Open vSwitch"
+        # A port not explicitly defined in the configuration will be left down and will drop all packets
+        # (https://docs.faucet.nz/en/latest/configuration.html)
+        interfaces:
+            1: # -> s1r1
+               name: s1-eth1
+               description: Connection to Rack 1
+               # a list of tagged_vlans that are allowed to pass through this interface
+               # (the 'native_vlan' attribute is used to associate a specific VLAN with untagged packets arriving and leaving this interface)
+               tagged_vlans: [10]
+            2: # -> s1r2
+               name: s1-eth2
+               description: Connection to Rack 2
+               tagged_vlans: [10]
+            3: # -> s1r3
+               name: s1-eth3
+               description: Connection to Rack 3
+               tagged_vlans: [10]
+            4: # -> s1r4
+               name: s1-eth4
+               description: Connection to Rack 4
+               tagged_vlans: [10]
+
+    s1r1:
+        description: Rack 1 ToR Switch
+        dp_id: 0x0000000000000011
+        interfaces:
+            1: # -> h1r1
+               description: Connection to Host 1 on Rack 1
+               native_vlan: 10
+               # ACLs are processed on the port that receives the packet on the switch
+               acl_in: 1
+            2: # -> h2r1
+               native_vlan: 10
+               acl_in: 1
+            3: # -> h3r1
+               native_vlan: 10
+               acl_in: 1
+            4: # -> h4r1
+               native_vlan: 10
+               acl_in: 1
+            5: # -> s1
+               description: Connection to Aggregate Switch
+               tagged_vlans: [10]
+    
+    s1r2:
+        description: Rack 2 ToR Switch
+        dp_id: 0x0000000000000021
+        interfaces:
+            1: # -> h1r2
+               native_vlan: 10
+               acl_in: 1
+            2: # -> h2r2
+               native_vlan: 10
+               acl_in: 1
+            3: # -> h3r2
+               native_vlan: 10
+               acl_in: 1
+            4: # -> h4r2
+               native_vlan: 10
+               acl_in: 1
+            5: # -> s1
+               description: Connection to Aggregate Switch
+               tagged_vlans: [10]
+    
+    s1r3:
+        description: Rack 3 ToR Switch
+        dp_id: 0x0000000000000031
+        interfaces:
+            1: # -> h1r3
+               native_vlan: 10
+               acl_in: 1
+            2: # -> h2r3
+               native_vlan: 10
+               acl_in: 1
+            3: # -> h3r3
+               native_vlan: 10
+               acl_in: 1
+            4: # -> h4r3
+               native_vlan: 10
+               acl_in: 1
+            5: # -> s1
+               description: Connection to Aggregate Switch
+               tagged_vlans: [10]
+    
+    s1r4:
+        description: Rack 4 ToR Switch
+        dp_id: 0x0000000000000041
+        interfaces:
+            1: # -> h1r4
+               native_vlan: 10
+               acl_in: 1
+            2: # -> h2r4
+               native_vlan: 10
+               acl_in: 1
+            3: # -> h3r4
+               native_vlan: 10
+               acl_in: 1
+            4: # -> h4r4
+               native_vlan: 10
+               acl_in: 1
+            5: # -> s1
+               description: Connection to Aggregate Switch
+               tagged_vlans: [10]

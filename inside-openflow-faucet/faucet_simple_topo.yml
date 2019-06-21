@@ -1,0 +1,25 @@
+version: 2
+vlans:
+    10:
+        name: Sandbox VLAN
+dps:
+    s1:
+        dp_id: 0x1
+        description: Access Switch
+        hardware: "Open vSwitch"
+        # A port not explicitly defined in the configuration will be left down and will drop all packets
+        # (https://docs.faucet.nz/en/latest/configuration.html)
+        interfaces:
+            1: # -> h1
+               name: s1-eth1
+               description: Connection to Host 1
+               native_vlan: 10
+            2: # -> h2
+               name: s1-eth2
+               native_vlan: 10
+            3: # -> h3
+               name: s1-eth3
+               native_vlan: 10
+            4: # -> h4
+               name: s1-eth4
+               native_vlan: 10
