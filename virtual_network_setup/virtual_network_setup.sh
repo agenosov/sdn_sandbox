@@ -2,15 +2,18 @@
 
 set -euo pipefail
 
-# TODO: introduce options for:
-# - specifying failure mode for bridge
-# - cleaning up
-
 bridge_name=s1
 
 # Failure mode for switch.
 # In case of a controller is configured, this mode controls whether the switch is capable of setting up new flows when there's no connection with controller.
 failure_mode=secure # standalone|secure
+
+run_as_netns()
+{
+    netns=$1
+    shift
+    ip netns exec $netns $@
+}
 
 function main
 {
@@ -55,7 +58,8 @@ function main
     ip netns add h3
 
     # Create switch
-    ovs-vsctl add-br $bridge_name
+    ovs-vsctl add-br $bridge_name \
+        -- set bridge $bridge_name fail_mode=$failure_mode
 
     # Create links
     link_type=veth
@@ -87,24 +91,21 @@ function main
     # TODO: make an ability for service controllers to connect to a switch...
     #ovs-vsctl set-controller $bridge_name ptcp:127.0.0.1:6654
 
-    echo "Set failure mode"
-    ovs-vsctl set-fail-mode $bridge_name $failure_mode
-
     echo "Verify that target controller is specified:"
     ovs-vsctl get-controller $bridge_name
     echo "====================="
 
     # Configure network
-    sudo ip netns exec h1 ifconfig h1-eth0 10.0.0.1
-    sudo ip netns exec h1 ifconfig lo up
+    run_as_netns h1 ifconfig h1-eth0 10.0.0.1
+    run_as_netns h1 ifconfig lo up
     ifconfig $bridge_name-eth1 up
 
-    sudo ip netns exec h2 ifconfig h2-eth0 10.0.0.2
-    sudo ip netns exec h2 ifconfig lo up
+    run_as_netns h2 ifconfig h2-eth0 10.0.0.2
+    run_as_netns h2 ifconfig lo up
     ifconfig $bridge_name-eth2 up
 
-    sudo ip netns exec h3 ifconfig h3-eth0 10.0.0.3
-    sudo ip netns exec h3 ifconfig lo up
+    run_as_netns h3 ifconfig h3-eth0 10.0.0.3
+    run_as_netns h3 ifconfig lo up
     ifconfig $bridge_name-eth3 up
 
     cat <<EOT
