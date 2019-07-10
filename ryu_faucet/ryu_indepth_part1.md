@@ -1,6 +1,8 @@
 # Contents
 1. [How ryu-manager works](#ryu-manager)
     1. [Context loading](#load-ctx)
+    2. [Instantiating applications](#instantiate-apps)
+    3. [Launching applications](#start-apps)
 2. [Processing of events](#events-processing)
 
 
@@ -30,7 +32,7 @@
 The concrete example of using context is how *SimpleSwitchRest13* gains access to the instance of *WSGIApplication*.
 
 
-### Instantiating apps
+### Instantiating apps <a name="instantiate-apps"/>
 
 * Instantiation of an app means creating an instance of a class and **registering an app within RYU framework**.
 
@@ -48,7 +50,7 @@ The concrete example of using context is how *SimpleSwitchRest13* gains access t
 * Finally on this stage the another mapping is created: from app name to corresponding class instance
 
 
-### Starting apps
+### Starting apps <a name="start-apps"/>
 
 * After all apps are instantiated they begin to start. **Starting each app leads to creation of a new thread**.
 
