@@ -12,6 +12,9 @@
    * also trace: negotiation phase change notification by handling the EventOFPStateChange event
    * EventOFPPortStateChange VS EventOFPPortStatus
 
+   * [Update 30.04.19]: ryu.controller.handler.MAIN_DISPATCHER:
+     Switch-features message received and sent set-config message... (!!!)
+
 6. *[OPTIONAL]* Packet parser library: http://ryu.readthedocs.org/en/latest/library_packet.html
 
 7. Work with ryu.controller.dpset.Events (handle switch (dis)connecting)

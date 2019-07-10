@@ -32,8 +32,8 @@ ovs-ofctl dump-aggregate s1
 ovs-ofctl monitor s1 watch:table=101
 ```
 
-[UPD.17.05]
 * view the full OpenFlow flow table, including hidden flows, on bridge br0:
+* ([explanation](https://github.com/openvswitch/ovs/blob/master/Documentation/topics/design.rst#implementation))
 ```bash
 ovs-appctl bridge/dump-flows br0
 ```

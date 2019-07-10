@@ -118,6 +118,40 @@
 			"response": []
 		},
 		{
+			"name": "get_aggregate_switch_flows_certain_table",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"table_id\": 103\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/flow/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"flow",
+						"1"
+					]
+				},
+				"description": "Filter flows installed on the 1-st switch"
+			},
+			"response": []
+		},
+		{
 			"name": "add_flow_entry",
 			"request": {
 				"method": "POST",
@@ -152,6 +186,40 @@
 			"response": []
 		},
 		{
+			"name": "add_flow_entry_with_timeout",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"dpid\": 1,\n\t\"cookie\": 42,\n\t\"priority\": 45000,\n\t\"match\": {\n\t\t\"in_port\": 3\n\t},\n\t\"actions\": [],\n\t\"hard_timeout\": 60\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/flowentry/add",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"flowentry",
+						"add"
+					]
+				},
+				"description": "Add flow entry to drop packets arrived via port 2 on the switch.\nNote that priority of this flow must be higher than priorities of flows which instruct where to forward packets."
+			},
+			"response": []
+		},
+		{
 			"name": "flow_entry_delete_strict",
 			"request": {
 				"method": "POST",
@@ -163,7 +231,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"dpid\": 1,\n\t\"actions\": [],\n\t\"priority\": 32000\n}"
+					"raw": "{\n\t\"dpid\": 1,\n\t\"actions\": [],\n\t\"idle_timeout\": 0,\n\t\"priority\": 45000,\n\t\"table_id\": 0,\n\t\"match\": {\n\t\t\"in_port\": 2\n\t}\n}"
 				},
 				"url": {
 					"raw": "http://127.0.0.1:8080/stats/flowentry/delete_strict",
@@ -181,7 +249,56 @@
 						"delete_strict"
 					]
 				},
-				"description": "Delete strictly specified flow entry"
+				"description": "Delete the flow entry which drops packets arrived via port 2 on the switch.\nNote that after processing it other hosts would be able to ping the h2 again."
+			},
+			"response": []
+		},
+		{
+			"name": "get_aggregate_flow_for_switch",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/stats/aggregateflow/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"aggregateflow",
+						"1"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get_table_features",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/stats/tablefeatures/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"tablefeatures",
+						"1"
+					]
+				},
+				"description": ""
 			},
 			"response": []
 		}

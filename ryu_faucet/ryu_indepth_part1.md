@@ -1,4 +1,10 @@
-## How ryu-manager works
+# Contents
+1. [How ryu-manager works](#ryu-manager)
+    1. [Context loading](#load-ctx)
+2. [Processing of events](#events-processing)
+
+
+## How ryu-manager works <a name="ryu-manager"/>
 
 * A list of applications is instantiated.</br>
   If no apps is provided via command line, this list will contain only the *ryu.controller.ofp_handler* application
@@ -8,10 +14,10 @@
 * There are 3 stages of working with apps: *loading context, instantiating and starting an apps*
 
 
-### Loading apps & context
+### Loading apps & context <a name="load_ctx"/>
 
 * AppManager attempts to load each specified application by first importing a module corresponding to the app's name and than by making an inspection of imported module. Module must define a subclass of RyuApp - only in this case inspection will be passed and defined class will be returned in order to be saved inside a dictionary which maps application names to corresponding classes. 
-  This is *the stage of applications loading* (see *ryu.base.app_manager.AppManager.load_apps*). The dictionary mapping app names to corresponding classes will be required for apps instantiation.
+  This is *the stage of applications loading* (see *ryu.base.app_manager.AppManager.load_apps*). The dictionary mentioned above will be required for apps instantiation.
 
 * In this stage AppManager also creates all *context classes* - these are classes which other applications want to use.
 
@@ -36,10 +42,10 @@ The concrete example of using context is how *SimpleSwitchRest13* gains access t
 
 * Application manager reports *which events each application provides and for which applications* and also *which events each application consumes*:
 
-** the _RyuApp.observers_ dictionary provides a *mapping from an event class to a list of applications interested to consume an event*
-** the *RyuApp.event_handlers* dictionary provides a *mapping from an event class to a list of handlers inside a concrete application*
+    1. _RyuApp.observers_ dictionary provides a mapping from an event class to a list of applications interested to consume an event
+    2. *RyuApp.event_handlers* dictionary provides a mapping from an event class to a list of handlers inside a concrete application
     
-* Finally on this stage the another mapping is created: from app name to corresponding **class instance**
+* Finally on this stage the another mapping is created: from app name to corresponding class instance
 
 
 ### Starting apps
@@ -54,21 +60,14 @@ The concrete example of using context is how *SimpleSwitchRest13* gains access t
 
 * If at least one app is going to use *WSGIApplication* then WSGIServer is to be launched.
 
-After all apps are started *ryu-manager* waits for their threads are finished
+After all apps are started *ryu-manager* waits for their threads are finished.
 
 
-### Events processing
+### Events processing <a name="events-processing"/>
 
-* One source of events for RYU apps is *OpenFlow controller* - it transforms into events messages received from switches
+* One source of events for RYU apps is *OpenFlow controller* - it transforms messages received from switches into events
 
 * Differences between the *set_ev_cls* and *set_ev_handler* decorators:
 
     1. the former is used to ...**TODO** 
     2. the latter is used to ...**TODO**    
-
-
-### Questions
-
-* Observers vs handlers of events? 
-* Why not to use a static method *AppManager.run_apps*? It's more convenient.
-

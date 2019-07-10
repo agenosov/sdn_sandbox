@@ -11,6 +11,7 @@
    * During (b), MN try to connect remote controller at localhost:6633 (6633 is OpenFlow port)
    * As no controller is launched: there is a message: "Unable to contact the remote controller..." and pingall fails
    * _Support for concrete version of OPF could be enabled_ by passing additional parameter: *--switch ovs,protocols=OpenFlow14*
+   * Ensure that the test controller provided with OVS is not launched (_openvswitch-testcontroller_)
 
 2. cd ryu && PYTHONPATH=.
 
