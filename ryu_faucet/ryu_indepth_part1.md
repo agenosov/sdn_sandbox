@@ -67,7 +67,12 @@ After all apps are started *ryu-manager* waits for their threads are finished.
 
 ### Events processing <a name="events-processing"/>
 
-* One source of events for RYU apps is *OpenFlow controller* - it transforms messages received from switches into events
+* One source of events for RYU apps is *OpenFlow controller* - it transforms messages received from switches into events.
+
+* An event in Ryu has at least these attributes:
+
+    1. _message_ - OPF message which corresponds to this event
+    2. _datapath_ - instance of Datapath class, corresponds to the connected switch
 
 * Differences between the *set_ev_cls* and *set_ev_handler* decorators:
 
