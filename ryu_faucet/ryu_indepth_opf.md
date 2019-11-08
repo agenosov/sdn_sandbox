@@ -19,7 +19,7 @@
 
     2. a valid OPF message is translated into an event by means of the *ryu.controller.ofp_event.ofp_msg_to_ev* function.
 
-* Each _datapath_ instance performs lookup of the *'ofp_event'* service. This service is produced by *ryu.controller.ofp_handler*.
+* Each _datapath_ instance performs lookup of the *'ofp_event'* service. This service is produced by *ryu.controller.ofp_handler*. The trick is that *OFPHandler* application set its name as *ofp_event*.
 
 
 
