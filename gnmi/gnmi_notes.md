@@ -12,6 +12,14 @@
 ./gnmi_client.sh
 ```
 
+### Python client from Google
+
+Before running the script, python virtual environment is to be created and requirements are to be installed, as indicated in [README](https://github.com/google/gnxi/gnmi_cli_py/README.md)
+
+```bash
+./gnmi_client2.sh
+```
+
 ### Examples of specifying gNMI paths
 
 * Request all config from the root
