@@ -14,10 +14,16 @@
 
 ### Python client from Google
 
-Before running the script, python virtual environment is to be created and requirements are to be installed, as indicated in [README](https://github.com/google/gnxi/gnmi_cli_py/README.md)
+Before running the script, python virtual environment is to be created and requirements are to be installed, as indicated in [README](https://github.com/google/gnxi/blob/master/gnmi_cli_py/README.md)
 
+#### Get configuration filtered by provided path
 ```bash
-./gnmi_client2.sh
+./gnmi_client2.sh -d <PATH_TO_GNMI_CLI_PY> -x /system/
+```
+
+#### Configure a failure-mode for OpenFlow agent
+```bash
+./gnmi_config_updater.sh -d <PATH_TO_GNMI_CLI_PY> -x /system/openflow/agent/config/failure-mode/ -v SECURE
 ```
 
 ### Examples of specifying gNMI paths
@@ -39,6 +45,14 @@ Specify gNMI path as below:
 
 ```bash
 -x /system
+```
+
+* Request OpenFlow agent's configuration
+
+This is for the case when the target is using [this example configuration](https://github.com/google/gnxi/blob/master/gnmi_target/openconfig-openflow.json)
+
+```bash
+-x /system/openflow/agent
 ```
 
 ### Nuances related to Authentication and RPC Authorization

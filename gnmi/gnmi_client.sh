@@ -33,3 +33,14 @@ for path in "/interfaces" "/system" ; do
         -compression "" \
         get $path
 done
+
+# Subscribe to system configuration updates
+$gnmi_bin \
+    -addr localhost:10161 \
+    -cafile $certs_path/monitoring_grpc_server.crt \
+    -certfile $certs_path/monitoring_grpc_ca.crt \
+    -keyfile $certs_path/monitoring_grpc_ca.key \
+    -username foo \
+    -password bar \
+    -compression "" \
+    subscribe '/system'
